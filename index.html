@@ -18,38 +18,38 @@
 
 <body class="bg-dark">
     <div class="col-12 d-flex justify-content-center align-items-center min-vh-100">
-        <div class="card col-11 col-md-6 col-lg-6" id="weatherCard" style="font-size: x-large;">  
+        <div class="card col-11 col-md-6 col-lg-6" id="divWeather" style="font-size: x-large;">  
             <div class="row g-0 align-items-center">
                 <!-- Left side -->
                 <div class="col-md-6 text-center border-end p-5">
                     <!-- Location and date-->
-                    <h1 id="locationName">Cookeville, TN</h1>
-                    <h2 id="date">Sunday, Mar 1</h2>
-                    <hr class="opacity-100">
+                    <h1 id="txtLocation">Cookeville, TN</h1>
+                    <h2 id="txtDate">Sunday, Mar 1</h2>
+                    <hr>
                     <!-- Current conditions -->
                     <h3>Current Conditions</h3>
-                    <p class="mt-3 mb-1" id="condition">Cloudy</p>
-                    <i id="weatherIcon" class="bi bi-cloud fs-1"></i>
+                    <p class="mt-3 mb-1" id="txtCondition">Cloudy</p>
+                    <i id="iconWeather" class="bi bi-cloud fs-1"></i>
                 </div>
                 <!-- Right side -->
                 <div class="col-md-6 p-3">
                     <div class="row text-center">
                         <!-- Current temp-->
                         <div class="col-6">
-                            <i id="tempIcon" class="bi bi-thermometer-half fs-1"></i>
-                            <span id="temp" class="fs-2">--°F</span>
+                            <i id="iconTemp" class="bi bi-thermometer-half fs-1"></i>
+                            <span id="txtTemp" class="fs-2">--°F</span>
                         </div>
                         <!-- Current humidity -->
                         <div class="col-6">
                             <i class="bi bi-droplet fs-1 text-info"></i>
-                            <span id="humidity" class="fs-2">--%</span>
+                            <span id="txtHumidity" class="fs-2">--%</span>
                         </div>
                     </div>
                     <div class="row mt-3 text-center">
                         <!-- Precipitation probability -->
                         <div class="col-12 mt-5">
                             <i class="bi bi-cloud-rain fs-1"></i>
-                            <span id="precipValue" class="fs-2">--%</span>
+                            <span id="txtPrecip" class="fs-2">--%</span>
                         </div>
                     </div>
                 </div>
@@ -74,104 +74,105 @@
         })
         .then(data => {
             // Update UI with weather data
-            document.getElementById('temp').textContent = `${data.current.temperature_2m}°F`;
+            document.getElementById('txtTemp').textContent = `${data.current.temperature_2m}°F`;
             // Update temp icon based on temperature (to have some kind of a unique feature)
-            const temp = data.current.temperature_2m;
-            const tempIcon = document.getElementById('tempIcon');
-            if (temp <= 32) {
-                tempIcon.className = 'bi bi-thermometer-snow fs-1 text-info';
-            } else if (temp <= 70) {
-                tempIcon.className = 'bi bi-thermometer-half fs-1';
+            const intTemp = data.current.temperature_2m;
+            const iconTemp = document.getElementById('iconTemp');
+            if (intTemp <= 32) {
+                iconTemp.className = 'bi bi-thermometer-snow fs-1 text-info';
+            } else if (intTemp <= 70) {
+                iconTemp.className = 'bi bi-thermometer-half fs-1';
             } else {
-                tempIcon.className = 'bi bi-thermometer-sun fs-1 text-danger';
+                iconTemp.className = 'bi bi-thermometer-sun fs-1 text-danger';
             }
 
-            document.getElementById('humidity').textContent = `${data.current.relative_humidity_2m}%`;
-            document.getElementById('precipValue').textContent = `${data.current.precipitation_probability}%`;
-            // Update UI with correct date from api call
+            document.getElementById('txtHumidity').textContent = `${data.current.relative_humidity_2m}%`;
+            document.getElementById('txtPrecip').textContent = `${data.current.precipitation_probability}%`;
+            // Update UI with correct date from api call (Used AI to help understand how to format the date from the timestamp)
             const date = new Date(data.current.time);
             const options = { weekday: 'long', month: 'short', day: 'numeric' };
-            document.getElementById('date').textContent = date.toLocaleDateString(undefined, options);
+            document.getElementById('txtDate').textContent = date.toLocaleDateString(undefined, options);
 
             // Map weather codes to conditions and icons
-            const weatherCode = data.current.weather_code;
-            let conditionText = '';
+            const intCode = data.current.weather_code;
+            let strCondition = '';
             let icon = '';
 
             // Codes found at the bottom of the documentation
-            switch (weatherCode) {
+            switch (intCode) {
                 case 0:
-                    conditionText = 'Clear';
+                    strCondition = 'Clear';
                     icon = 'bi-sun';
                     break;
                 case 1:
                 case 2:
                 case 3:
-                    conditionText = 'Partly Cloudy';
+                    strCondition = 'Partly Cloudy';
                     icon = 'bi-cloud-sun';
                     break;
                 case 45:
                 case 48:
-                    conditionText = 'Fog';
+                    strCondition = 'Fog';
                     icon = 'bi-cloud-fog';
                     break;
                 case 51:
                 case 53:
                 case 55:
-                    conditionText = 'Light Rain';
+                    strCondition = 'Light Rain';
                     icon = 'bi-cloud-drizzle';
                     break;
                 case 56:
-                case 57:
-                case 66:
+                case 57: // Freezing drizzle is basically the same as freezing rain
+                case 66: 
                 case 67:
-                    conditionText = 'Freezing Rain';
+                    strCondition = 'Freezing Rain';
                     icon = 'bi-cloud-sleet';
                     break;
                 case 61:
                 case 63:
                 case 65:
-                    conditionText = 'Rain';
+                    strCondition = 'Rain';
                     icon = 'bi-cloud-rain';
                     break;
                 case 71:
                 case 73:
                 case 75:
-                case 77:
-                    conditionText = 'Snow';
+                case 77: // Not sure what snow grains are but its probably just more snow
+                    strCondition = 'Snow';
                     icon = 'bi-cloud-snow';
                     break;
                 case 80:
                 case 81:
                 case 82:
-                    conditionText = 'Rain Showers';
+                    strCondition = 'Rain Showers';
                     icon = 'bi-cloud-rain';
                     break;
                 case 85:
                 case 86:
-                    conditionText = 'Snow Showers';
+                    strCondition = 'Snow Showers';
                     icon = 'bi-cloud-snow';
                     break;
                 case 95:
-                    conditionText = 'Thunderstorm';
+                    strCondition = 'Thunderstorm';
                     icon = 'bi-cloud-lightning-rain';
                     break;
                 default:
-                    conditionText = 'Unknown';
+                    strCondition = 'Unknown';
                     icon = 'bi-question-circle';
             }
             // Update the UI with the condition and icon
-            document.getElementById('condition').textContent = conditionText;
-            document.getElementById('weatherIcon').className = `bi ${icon} fs-1`;
+            document.getElementById('txtCondition').textContent = strCondition;
+            document.getElementById('iconWeather').className = `bi ${icon} fs-1`;
         })
         // Incase of an error, update UI
         .catch(error => {
             console.error('Error fetching weather data:', error);
-            document.getElementById('condition').textContent = 'Unable to load weather data. Please try again later.';
+            document.getElementById('txtCondition').textContent = 'Unable to load weather data. Please try again later.';
         });
     </script>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
 </body>
 </html>
-<!-- Generative AI Usage: I used AI to create my icon as well as troubleshoot things like date formatting and how to position things like I wanted them to be displayed.-->
+<!-- Generative AI Usage: I used AI to create my icon as well as troubleshoot things like date formatting 
+and how to position things how I wanted them to be displayed such as how to use rows.-->
